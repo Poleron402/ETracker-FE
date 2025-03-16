@@ -13,6 +13,10 @@ const Navbar = ()=>{
                         About
                     </Link>
                 </div>
+                <div id='loginsignuup'>
+                    <Link id='login'>Login</Link>
+                    <Link id='signup'>Signup</Link>
+                </div>
             </div>
         </>
     )

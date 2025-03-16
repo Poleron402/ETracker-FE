@@ -160,3 +160,23 @@ table td:last-child{
   margin-inline: 10vw;
   justify-content: space-evenly;
 }
+#login, #signup{
+  padding: 8px;
+  margin-inline: 8px;
+  transition: background-color 0.4s cubic-bezier(0.075, 0.82, 0.165, 1), color 0.4s cubic-bezier(0.075, 0.82, 0.165, 1)
+  ;
+}
+#login{
+  background-color: black;
+  color: white;
+  padding-inline: 12px;
+  border-radius: 10px;
+  
+}
+#login:hover{
+  background-color: #565cc4;
+  color: rgb(255, 255, 255);
+}
+#signup:hover{
+  color: #202368
+}
