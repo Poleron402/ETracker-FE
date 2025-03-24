@@ -28,7 +28,7 @@ const ExTrack = ()=>{
         setTypes(response.data)
     }
     const getExpenses = async()=>{
-        let response = await api.get("/")
+        let response = await api.get("/expenses/")
         const data = await response.data
         
         const dataM = data.map(exp => {
@@ -39,7 +39,7 @@ const ExTrack = ()=>{
         console.log(response.data)
     }
     const handleDelete = async(id)=>{
-        const response = await api.delete(`/${id}`)
+        const response = await api.delete(`/expenses/${id}`)
         getExpenses()
     }
     const addExpense = async()=>{
@@ -48,7 +48,7 @@ const ExTrack = ()=>{
             "type": expenseType,
             "note": expenseNote
         }
-        let response = await api.post("/", myexpense)
+        let response = await api.post("/expenses/", myexpense)
         getExpenses()
         setOpenControl(false)
     }

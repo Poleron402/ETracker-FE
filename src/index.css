@@ -180,3 +180,6 @@ table td:last-child{
 #signup:hover{
   color: #202368
 }
+#loginsignuup{
+  display: flex;
+}

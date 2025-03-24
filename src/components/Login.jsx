@@ -1,0 +1,64 @@
+import {Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button} from "@mui/material";
+import { useState } from "react";
+import { api } from "../utilities"
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../redux/authSlice";
+const Login = ()=>{
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const dispatch = useDispatch()
+    const loginHandler = async() =>{
+        let data = {
+            email: username,
+            password: password
+        }
+        try{
+            let response = await api.post("/login", data)
+            if (response.status === 200){
+                const data = response.data
+                dispatch(setCredentials({user: data.username, token: data.token}))
+                setDialogOpen(false)
+            }
+        }catch(err){
+            alert(err)
+        }
+       
+        
+    }
+    return(
+        <>
+            <Button id='login' onClick={()=>{
+                setDialogOpen(true)
+            }}>Login</Button>
+            <Dialog open={dialogOpen}
+            slotProps={{
+                backdrop:{
+                style: {
+                  backgroundColor: "rgba(23, 32, 82, 0.2)", // Slight dark overlay
+                  backdropFilter: "blur(15px)", // Blur effect
+                },}
+              }}>
+                <DialogTitle>
+                    Welcome aboard!
+                </DialogTitle>
+                <DialogContent>
+                    <TextField style={{marginTop: 5}} variant="outlined" label="Email" value={username} onChange={(e)=>setUsername(e.target.value)}>
+                    </TextField>
+                    <br></br>
+                    <TextField type="password" style={{marginTop: 15}} variant="outlined" label="Password" value={password} onChange={e=>setPassword(e.target.value)}></TextField>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={()=>{
+                        loginHandler()
+                    }}>Login</Button>
+                    <Button onClick={()=>{
+                        setDialogOpen(false)
+                    }}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
+        </>
+    )
+}
+
+export default Login
