@@ -3,11 +3,15 @@ import { useState } from "react";
 import { api } from "../utilities"
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../redux/authSlice";
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
+
 const Login = ()=>{
     const [dialogOpen, setDialogOpen] = useState(false)
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     const loginHandler = async() =>{
         let data = {
             email: username,
@@ -17,8 +21,11 @@ const Login = ()=>{
             let response = await api.post("/login", data)
             if (response.status === 200){
                 const data = response.data
+                console.log(data.token)
+                Cookies.set("token", data.token)
                 dispatch(setCredentials({user: data.username, token: data.token}))
                 setDialogOpen(false)
+                navigate("/track")
             }
         }catch(err){
             alert(err)
@@ -26,12 +33,18 @@ const Login = ()=>{
        
         
     }
+    const handleKeyDown = (e) =>{
+        if (e.key == 'Enter'){
+            loginHandler()
+        }
+    }
     return(
         <>
             <Button id='login' onClick={()=>{
                 setDialogOpen(true)
             }}>Login</Button>
             <Dialog open={dialogOpen}
+            onKeyDown={handleKeyDown}
             slotProps={{
                 backdrop:{
                 style: {

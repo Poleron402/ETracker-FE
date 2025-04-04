@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Cookies from 'js-cookie';
 
 const initialState = {
     user: null,
-    token: null,
-    isAuthenticated: false,
+    token: Cookies.get('token') || null,
 }
 
 const authSlice =  createSlice({
@@ -14,12 +14,10 @@ const authSlice =  createSlice({
             const {user, accessToken} = action.payload
             state.user = user
             state.token = accessToken 
-            state.isAuthenticated = true   
         },
         logout: (state)=>{
             state.user = null
             state.token = null
-            state.isAuthenticated = false   
         },
     },
 })

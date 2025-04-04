@@ -1,86 +1,168 @@
 import { useState, useEffect } from "react"
-import { Button } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogTitle, DialogContent} from "@mui/material"
 import { api } from "../utilities"
-import {X} from "lucide-react"
-const Types = {
-    'FOOD': "rgb(197, 77, 50)",
-    'MISC': "rgb(38, 111, 160)",
-    'CLOTHING': "rgb(139, 77, 163)",
-    'SERVICE': "  #437a37",
-    'BILL': "rgb(216, 162, 14)",
-    'ENTERTAINMENT': "  #e5b4b1",
-    'PRESENT': "rgb(101, 117, 58)",
-    'CAR': "rgb(109, 98, 207)"
-}
+import Cookies from "js-cookie"
+import {X, PlusIcon, BarChart, ArrowDownNarrowWide} from "lucide-react"
+import AddExpense from "../components/AddExpense"
+import { Types } from "../utilities"
+
 
 
 const ExTrack = ()=>{
     const [expenses, setExpenses] = useState([])
+    const [editedExpense, setEditedExpense] = useState({})
+    const [editingId, setEditingId] = useState(null)
     const [types, setTypes] = useState([])
     const [openControl, setOpenControl] = useState(false)
-
     const [expenseAmount, setExpenseAmount] = useState()
-    const [expenseType, setExpenseType] = useState()
+    const [expenseType, setExpenseType] = useState("FOOD")
     const [expenseNote, setExpenseNote] = useState("")
+    const [deletingExp, setDeletingExp] = useState(null)
+    const [deletingDialog, setDeletingDialog] = useState(false)
+    const [showStats, setShowState] = useState(false)
+    const token = Cookies.get("token")
+
     const getTypes = async()=>{
-        let response = await api.get("types")
-        console.log(response.data)
-        setTypes(response.data)
+        try{
+            if (token){
+                let response = await api.get("/expenses/types",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        }
+                    }
+                )
+                console.log(response.data)
+                setTypes(response.data)
+            }
+        }catch (err){
+            alert(err)
+        }
+        
     }
     const getExpenses = async()=>{
-        let response = await api.get("/expenses/")
+        let response = await api.get("/expenses/",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  }
+            }
+        )
         const data = await response.data
         
-        const dataM = data.map(exp => {
-            const date = new Date(exp.date);
-            return {...exp, date: date.toISOString().split('T')[0]}})
-        console.log(dataM)
-        setExpenses(dataM)
+        let dataF = data.sort((a, b)=>new Date(b.date)-new Date(a.date))
+
+        // let dataM = dataF.map(exp => {
+        //     const date = new Date(exp.date);
+        //     return {...exp, date: date.toISOString().split('T')[0]}})
+
+        setExpenses(dataF)
         console.log(response.data)
     }
-    const handleDelete = async(id)=>{
-        const response = await api.delete(`/expenses/${id}`)
+    const handleDelete = async()=>{
+        const response = await api.delete(`/expenses/${deletingExp.id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  }
+            })
+        setDeletingExp(null)
+        setDeletingDialog(false)
         getExpenses()
     }
+
     const addExpense = async()=>{
         let myexpense = {
             "expense": expenseAmount,
             "type": expenseType,
             "note": expenseNote
         }
-        let response = await api.post("/expenses/", myexpense)
+        let response = await api.post("/expenses/", myexpense,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  }
+            })
         getExpenses()
         setOpenControl(false)
+    }
+    const handleKeyDown =(e)=>{
+        if (e.key  == 'Enter'){
+            addExpense()
+        }
+    }
+    const closeController = () =>{
+        setExpenseAmount(null)
+        setExpenseType("")
+        setExpenseNote("")
+        setOpenControl(false)
+    }
+
+    // Editing stufffff
+    const handleDoubleClick = (id, exp) =>{
+        setEditingId(id)
+        setEditedExpense(exp)
+    }
+
+    const handleOnBlur = () =>{
+        sentPutReqToUpdate()
+        setEditingId(null)
+    }
+    const sentPutReqToUpdate = async()=>{
+        let response= await api.put(`/expenses/${editedExpense.id}`, editedExpense, 
+            {
+                headers:
+                {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        )
+        console.log(response)
     }
     useEffect(()=>{
         getExpenses()
         getTypes()
-    }, [])
+    }, [token])
 
     return (
                 <>
+                
                 <div id="table_main">
+                <div>
+                    <Button className='regularButton' variant="contained" onClick={()=>setOpenControl(true)}>Add Expense <PlusIcon/></Button>
+                    <Button style={{marginInline: 10}} className='regularButton' variant="contained" onClick={()=>setOpenControl(true)}>Get Stats <BarChart/></Button>
+                </div>
+                {
+                openControl && (
+                    <AddExpense handleKeyDown={handleKeyDown} 
+                    expenseAmount={expenseAmount}
+                    setExpenseNote={setExpenseNote}
+                    setExpenseType={setExpenseType}
+                    setExpenseAmount={setExpenseAmount}
+                    expenseType={expenseType}
+                    expenseNote={expenseNote}
+                    closeController={closeController}
+                    types={types}
+                    addExpense={addExpense}
+                    />
+                )
+                }
+                <br></br>
                 <table>
+                    <thead>
                     <tr>
-                        <th>
-                            Date
-                        </th>
-                        <th>
-                            Expense Amount
-                        </th>
-                        <th>
-                            Expense Type
-                        </th>
-                        <th>
-                            Note
-                        </th>
+                        <th> <span className="lucide-aligned"> Date &nbsp;<span className='lucide-button'><ArrowDownNarrowWide /></span></span></th>
+                        <th> <span className="lucide-aligned">Expense Amount &nbsp;<span className='lucide-button'><ArrowDownNarrowWide/></span></span></th>
+                        <th> Expense Type</th>
+                        <th> Note</th>
                     </tr>
+                    </thead>
+                    <tbody>
                     {
-                        
                         expenses.map((expense, id)=>(
-                            <tr>
+                            <tr key = {expense.id}>
                                 <td>
-                                    {expense.date}  
+                                    {expense.date.split('T')[0]} 
                                 </td>
                                 <td>
                                     ${expense.expense.toFixed(2)}
@@ -91,60 +173,61 @@ const ExTrack = ()=>{
                                     borderRadius: 10,
                                     color: "white"}}>• {expense.type}</p>
                                 </td>
-                                <td>
-                                    {expense.note}
+                                <td 
+                                onBlur={handleOnBlur}
+                                onDoubleClick={()=>handleDoubleClick(expense.id, expense)}>
+                                    {
+                                        editingId === expense.id ?
+                                        <input 
+                                        autoFocus
+                                        value = {editedExpense.note}
+                                        onChange={(e)=>{
+                                            setEditedExpense(prev => (
+                                                {...prev, note: e.target.value}
+                                            ))
+                                        }}
+                                        ></input>
+                                        :
+                                        expense.note
+                                    }
+                                    
                                 </td>
                                 <td className="table_menu">
-                                    <Button onClick={()=>handleDelete(expense.id)}><X/></Button>
+                                    <Button onClick={()=>{
+                                        setDeletingExp(expense)
+                                        setDeletingDialog(true)
+                                        
+                                    }}><X/></Button>
                                 </td>
                             </tr>
                         ))
                     }
-                </table>
-                <div>
-                <Button className='regularButton' variant="contained" onClick={()=>setOpenControl(true)}>Add Expense</Button>
-                <Button className='regularButton' variant="contained" onClick={()=>setOpenControl(true)}>Get Stats</Button>
-                </div>
-                </div>
-                    
-        {
-            openControl && (
-            <div className="form">
-                <table>
-                    <tr>
-                        <td>
-                            <label htmlFor='expense'>Expense:</label>
-                        </td>
-                        <td>
-                            <input id='expense' value = {expenseAmount} onChange={e=>setExpenseAmount(e.target.value)}></input>
-                        </td>
-                        <td>
-                            <label htmlFor='types'>Expense Type:</label>
-                        </td>
-                        <td>
-                        <select name="types" id="types" value={expenseType} onChange={e=>setExpenseType(e.target.value)}>
-                            {
-                                types.map((type, id)=>(
-                                    <option value={type}>{type}</option>
-                                ))
-                            }
-                        </select>
-                        </td>
-                        <td>
-                            Note:
-                        </td>
-                        <td>
-                            <input type="text" value={expenseNote} onChange={e=>setExpenseNote(e.target.value)}></input>
-                        </td>
-                        <td>
-                            <Button variant="contained" onClick={addExpense}>Add</Button>
-                        </td>
-                    </tr>
+                    </tbody>
                 </table>
                 
-            </div>
-            )
-        }
+                </div>
+                    
+                <Dialog open={deletingDialog}>
+                    <DialogTitle>Confirm delete</DialogTitle>
+                    <DialogContent>
+                        {deletingExp &&
+                        (
+                            <p>Are you surre you would like to delete 
+                            expense of ${deletingExp.expense} on {deletingExp.date.split('T')[0]} for {deletingExp.type}</p>
+                        )
+                        }
+                        
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={()=>{
+                            handleDelete()
+                        }}>Delete</Button>
+                        <Button onClick={()=>{
+                            setDeletingExp(null)
+                            setDeletingDialog(false)
+                        }}>Nevermind</Button>
+                    </DialogActions>
+                </Dialog>
         </>
     )
 }

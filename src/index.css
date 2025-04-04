@@ -3,14 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  color: rgba(0, 0, 0, 0.87);
 }
 #main{
   min-width: 320px;
@@ -38,19 +31,6 @@ h1 {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }
 
 
@@ -90,7 +70,9 @@ button:focus-visible {
   width: 50%;
   margin-inline: auto;
 }
-
+td{
+  cursor: pointer;
+}
 table th, table td{
   border: 1px solid #a3a7e9;
   color: #213547;
@@ -182,4 +164,14 @@ table td:last-child{
 }
 #loginsignuup{
   display: flex;
+}
+.lucide-aligned{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lucide-button{
+  cursor: pointer;
+  color: #bebdd6;
+  margin-top: 5px;
 }
