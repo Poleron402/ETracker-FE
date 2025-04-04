@@ -20,7 +20,7 @@ const ExTrack = ()=>{
     const [deletingExp, setDeletingExp] = useState(null)
     const [deletingDialog, setDeletingDialog] = useState(false)
     const [updateFlag, setUpdateFlag] = useState(false)
-    const [showStats, setShowState] = useState(false)
+    const [showStats, setShowStats] = useState(false)
     const token = Cookies.get("token")
 
     const getTypes = async()=>{
@@ -97,20 +97,25 @@ const ExTrack = ()=>{
 
     // Editing stufffff
     const handleDoubleClick = (newid, exp, newfield) =>{
+
         setEditingField({id: newid, field: newfield})
         setEditedExpense(exp)
     }
 
-    const handleOnBlur = () =>{
-
-        sentPutReqToUpdate()
+    const handleOnBlur = (newfield) =>{
+        if (newfield === "date"){
+            const newdate = new Date(`${editedExpense.date}T00:00:00`)
+            const updated = {...editedExpense, date: newdate}
+            sentPutReqToUpdate(updated)
+        }else{
+            sentPutReqToUpdate(editedExpense)
+        }
+        
         setEditingField({id:null, field: null})
     }
-    const sentPutReqToUpdate = async()=>{
-        const newdate = new Date(`${editedExpense.date}T00:00:00`)
-        const updated = {...editedExpense, date: newdate}
-        setEditedExpense(updated)
-        let response= await api.put(`/expenses/${editedExpense.id}`, updated, 
+    const sentPutReqToUpdate = async(edited)=>{
+        
+        let response= await api.put(`/expenses/${editedExpense.id}`, edited, 
             {
                 headers:
                 {
@@ -134,7 +139,7 @@ const ExTrack = ()=>{
                 <div id="table_main">
                 <div>
                     <Button className='regularButton' variant="contained" onClick={()=>setOpenControl(true)}>Add Expense <PlusIcon/></Button>
-                    <Button style={{marginInline: 10}} className='regularButton' variant="contained" onClick={()=>setOpenControl(true)}>Get Stats <BarChart/></Button>
+                    <Button style={{marginInline: 10}} className='regularButton' variant="contained" onClick={()=>setShowStats(true)}>Get Stats <BarChart/></Button>
                 </div>
                 {
                 openControl && (
@@ -178,20 +183,51 @@ const ExTrack = ()=>{
                                                 {...prev, date: e.target.value}
                                             ))
                                         }}
-                                        onBlur={handleOnBlur}
+                                        onBlur={()=>handleOnBlur("date")}
                                         ></input>
                                         :
-                                        expense.date.split('T')[0]
+                                        expense.date && expense.date.split('T')[0]
                                     }
                                 </td>
-                                <td>
-                                    ${expense.expense.toFixed(2)}
+                                <td onDoubleClick={()=>handleDoubleClick(expense.id, expense, "expense")}>
+                                {
+                                        editingField.id === expense.id && editingField.field == "expense"?
+                                        <>$<input
+                                        autoFocus
+                                        value = {editedExpense.expense}
+                                        onChange={(e)=>{
+                                            setEditedExpense(prev => (
+                                                {...prev, expense: e.target.value}
+                                            ))
+                                        }}
+                                        onBlur={()=>handleOnBlur("expense")}
+                                        ></input>
+                                        </>
+                                        :
+                                    (<h3>${expense.expense.toFixed(2)}</h3>)
+                                }       
                                 </td>
-                                <td onDoubleClick={()=>handleUpdate(id)}>
-                                <p className="type_tag" style={{backgroundColor: Types[expense.type], 
-                                    padding: 5, 
-                                    borderRadius: 10,
-                                    color: "white"}}>• {expense.type}</p>
+                                <td onDoubleClick={()=>handleDoubleClick(expense.id, expense, "type")}>
+                                {
+                                    editingField.id === expense.id && editingField.field == "type"?
+                                    <select 
+                                    autoFocus
+                                    onBlur={()=>handleOnBlur("type")}
+                                    name="types" id="types" value={editedExpense.type} 
+                                    onChange={(e)=>setEditedExpense(prev=>({...prev, type: e.target.value}))}>
+                                        {
+                                            types.map((type, id)=>(
+                                                <option value={type}>{type}</option>
+                                            ))
+                                        }
+                                    </select>
+                                    :
+                                    <p className="type_tag" style={{backgroundColor: Types[expense.type], 
+                                        padding: 5, 
+                                        borderRadius: 10,
+                                        color: "white"}}>• {expense.type}
+                                    </p>
+                                }
                                 </td>
                                 <td 
                                 
@@ -200,7 +236,7 @@ const ExTrack = ()=>{
                                         editingField.id === expense.id && editingField.field == "note" ?
                                         <input 
                                         autoFocus
-                                        onBlur={handleOnBlur}
+                                        onBlur={()=>handleOnBlur("note")}
                                         value = {editedExpense.note}
                                         onChange={(e)=>{
                                             setEditedExpense(prev => (
