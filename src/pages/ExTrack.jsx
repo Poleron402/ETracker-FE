@@ -11,7 +11,7 @@ import { Types } from "../utilities"
 const ExTrack = ()=>{
     const [expenses, setExpenses] = useState([])
     const [editedExpense, setEditedExpense] = useState({})
-    const [editingId, setEditingId] = useState(null)
+    const [editingField, setEditingField] = useState({id: null, field: null})
     const [types, setTypes] = useState([])
     const [openControl, setOpenControl] = useState(false)
     const [expenseAmount, setExpenseAmount] = useState()
@@ -19,6 +19,7 @@ const ExTrack = ()=>{
     const [expenseNote, setExpenseNote] = useState("")
     const [deletingExp, setDeletingExp] = useState(null)
     const [deletingDialog, setDeletingDialog] = useState(false)
+    const [updateFlag, setUpdateFlag] = useState(false)
     const [showStats, setShowState] = useState(false)
     const token = Cookies.get("token")
 
@@ -32,7 +33,7 @@ const ExTrack = ()=>{
                         }
                     }
                 )
-                console.log(response.data)
+                // console.log(response.data)
                 setTypes(response.data)
             }
         }catch (err){
@@ -52,12 +53,8 @@ const ExTrack = ()=>{
         
         let dataF = data.sort((a, b)=>new Date(b.date)-new Date(a.date))
 
-        // let dataM = dataF.map(exp => {
-        //     const date = new Date(exp.date);
-        //     return {...exp, date: date.toISOString().split('T')[0]}})
-
         setExpenses(dataF)
-        console.log(response.data)
+        // console.log(response.data)
     }
     const handleDelete = async()=>{
         const response = await api.delete(`/expenses/${deletingExp.id}`,
@@ -99,17 +96,21 @@ const ExTrack = ()=>{
     }
 
     // Editing stufffff
-    const handleDoubleClick = (id, exp) =>{
-        setEditingId(id)
+    const handleDoubleClick = (newid, exp, newfield) =>{
+        setEditingField({id: newid, field: newfield})
         setEditedExpense(exp)
     }
 
     const handleOnBlur = () =>{
+
         sentPutReqToUpdate()
-        setEditingId(null)
+        setEditingField({id:null, field: null})
     }
     const sentPutReqToUpdate = async()=>{
-        let response= await api.put(`/expenses/${editedExpense.id}`, editedExpense, 
+        const newdate = new Date(`${editedExpense.date}T00:00:00`)
+        const updated = {...editedExpense, date: newdate}
+        setEditedExpense(updated)
+        let response= await api.put(`/expenses/${editedExpense.id}`, updated, 
             {
                 headers:
                 {
@@ -117,12 +118,15 @@ const ExTrack = ()=>{
                 },
             }
         )
-        console.log(response)
+        if (response.status === 200){
+            setUpdateFlag(!updateFlag)
+        }
+        // console.log(response)
     }
     useEffect(()=>{
         getExpenses()
         getTypes()
-    }, [token])
+    }, [token, updateFlag])
 
     return (
                 <>
@@ -161,8 +165,24 @@ const ExTrack = ()=>{
                     {
                         expenses.map((expense, id)=>(
                             <tr key = {expense.id}>
-                                <td>
-                                    {expense.date.split('T')[0]} 
+                                <td 
+                                onDoubleClick={()=>handleDoubleClick(expense.id, expense, "date")}>
+                                     {
+                                        editingField.id === expense.id && editingField.field == "date"?
+                                        <input
+                                        
+                                        type="date"
+                                        value = {editedExpense.date}
+                                        onChange={(e)=>{
+                                            setEditedExpense(prev => (
+                                                {...prev, date: e.target.value}
+                                            ))
+                                        }}
+                                        onBlur={handleOnBlur}
+                                        ></input>
+                                        :
+                                        expense.date.split('T')[0]
+                                    }
                                 </td>
                                 <td>
                                     ${expense.expense.toFixed(2)}
@@ -174,12 +194,13 @@ const ExTrack = ()=>{
                                     color: "white"}}>• {expense.type}</p>
                                 </td>
                                 <td 
-                                onBlur={handleOnBlur}
-                                onDoubleClick={()=>handleDoubleClick(expense.id, expense)}>
+                                
+                                onDoubleClick={()=>handleDoubleClick(expense.id, expense, "note")}>
                                     {
-                                        editingId === expense.id ?
+                                        editingField.id === expense.id && editingField.field == "note" ?
                                         <input 
                                         autoFocus
+                                        onBlur={handleOnBlur}
                                         value = {editedExpense.note}
                                         onChange={(e)=>{
                                             setEditedExpense(prev => (
@@ -206,7 +227,7 @@ const ExTrack = ()=>{
                 </table>
                 
                 </div>
-                    
+                {/* Delete confirmation dialog */}
                 <Dialog open={deletingDialog}>
                     <DialogTitle>Confirm delete</DialogTitle>
                     <DialogContent>

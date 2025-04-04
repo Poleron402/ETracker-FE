@@ -22,7 +22,7 @@ const Login = ()=>{
             if (response.status === 200){
                 const data = response.data
                 console.log(data.token)
-                Cookies.set("token", data.token)
+                Cookies.set("token", data.token, {expires: 7})
                 dispatch(setCredentials({user: data.username, token: data.token}))
                 setDialogOpen(false)
                 navigate("/track")
