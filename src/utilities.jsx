@@ -4,6 +4,20 @@ export const api = axios.create({
   baseURL: "http://127.0.0.1:8080/",
 });
 
+export const apiError = (error, context="Operation")=>{
+  if (error.response){
+    alert(`${context} failed: ${error.reponse || error.message}`)
+  }else{
+    alert(`${context} failed: Network failure`)
+  }
+
+}
+
+export const handleKeyDown =(e)=>{
+  if (e.key  == 'Enter'){
+      addExpense()
+  }
+}
 export const Types = {
     'FOOD': "rgb(197, 77, 50)",
     'MISC': "rgb(18, 179, 45)",

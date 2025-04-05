@@ -175,3 +175,17 @@ table td:last-child{
   color: #bebdd6;
   margin-top: 5px;
 }
+#downloadButton{
+  cursor: pointer;
+}
+
+#options{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 85%
+}
+
+#menu{
+  position: absolute;
+}

@@ -17,6 +17,7 @@ const AddExpense = ({handleKeyDown,
     return (
         <form onKeyDown={handleKeyDown} className="form">
                 <table>
+                    <tbody>
                     <tr>
                         <td>
                             <label htmlFor='expense'>Expense:</label>
@@ -33,7 +34,7 @@ const AddExpense = ({handleKeyDown,
                         <select name="types" id="types" value={expenseType} onChange={e=>setExpenseType(e.target.value)}>
                             {
                                 types.map((type, id)=>(
-                                    <option value={type}>{type}</option>
+                                    <option key={id} value={type}>{type}</option>
                                 ))
                             }
                         </select>
@@ -52,6 +53,7 @@ const AddExpense = ({handleKeyDown,
                         </td>
                         
                     </tr>
+                    </tbody>
                 </table>
                 
             </form>

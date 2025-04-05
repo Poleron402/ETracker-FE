@@ -17,7 +17,8 @@
     "react": "^19.0.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.0.0",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
