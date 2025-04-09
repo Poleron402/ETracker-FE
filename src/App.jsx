@@ -4,6 +4,7 @@ import About from './pages/About'
 import NotFound from './pages/NotFound'
 import ExTrack from './pages/ExTrack'
 import Navbar from './components/Navbar'
+import Data from './components/Data'
 function Home(){
   return (
     <>
@@ -21,6 +22,7 @@ function App() {
         <Route path="/" element={<Main />} />
         <Route path="/about" element={<About />} />
         <Route path="/track" element={<ExTrack />} />
+        <Route path="/stats" element={<Data />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

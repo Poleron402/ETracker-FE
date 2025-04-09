@@ -8,29 +8,25 @@ import { api, apiError } from "../utilities"
 import Logout from "./Logout"
 
 const Navbar = ()=>{
-    const [authed, setAuthed] = useState(null)
+    const [authed, setAuthed] = useState(Cookies.get("token") || null)
 
     const checkTokenExpired = async()=>{
-        const token = Cookies.get("token")
-        if (!token){
-            setAuthed(null)
-        }else{
-            setAuthed(token)
-        }
-        try{
-            let response = await api.get("/api/auth/check",{
-                headers:{
-                    Authorization: `Bearer ${token}`
+        if (authed){
+            try{
+                let response = await api.get("/api/auth/check",{
+                    headers:{
+                        Authorization: `Bearer ${authed}`
+                    }
+                })
+            
+            setAuthed(response.data.slice(7))
+            }catch(err){
+                if (err.response?.status === 403){
+                    Cookies.remove("token")
+                    setAuthed(null)
+                }else{
+                    apiError(err, "Checking authentication and token validity")
                 }
-            })
-           setAuthed(response.data.token)
-
-        }catch(err){
-            if (err.response?.status === 403){
-                Cookies.remove("token")
-                setAuthed(null)
-            }else{
-                apiError(err, "Checking authentication and token validity")
             }
         }
     }

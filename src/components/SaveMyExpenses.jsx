@@ -10,7 +10,6 @@ const SaveExpenses = ({data}) =>{
 
     const [showMenu, setShowMenu] = useState(false)
 
-
     const saveAs=(what)=>{
         if (what === 'xlsx'){
             let myData = data.map(obj=> {
