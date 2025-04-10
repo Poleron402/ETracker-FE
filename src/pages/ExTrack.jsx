@@ -3,11 +3,11 @@ import { data, useNavigate } from "react-router-dom"
 import { Button, Dialog, DialogActions, DialogTitle, DialogContent} from "@mui/material"
 import { api, apiError, handleKeyDown } from "../utilities"
 import Cookies from "js-cookie"
-import {X, PlusIcon, BarChart, ArrowDownNarrowWide, ArrowDownWideNarrow, FilterIcon} from "lucide-react"
+import {X, PlusIcon, BarChart} from "lucide-react"
 import AddExpense from "../components/AddExpense"
 import { Types } from "../utilities"
 import SaveExpenses from "../components/SaveMyExpenses"
-
+import SortExpense from "../components/SortExpense"
 
 const ExTrack = ()=>{
     const [expenses, setExpenses] = useState([])
@@ -21,10 +21,7 @@ const ExTrack = ()=>{
     const [deletingExp, setDeletingExp] = useState(null)
     const [deletingDialog, setDeletingDialog] = useState(false)
     const [updateFlag, setUpdateFlag] = useState(false)
-    const [dateSortedOldestFirst, setDateSortedOldestFirst] = useState(false)
-    const [amountSortedLargestFirst, setAmountSortedLargestFirst] = useState(false)
-    const [amountSortedByDate, setAmountSortedByDate] = useState(false)
-    
+   
     const token = Cookies.get("token")
     const navigate = useNavigate()
     const getTypes = async()=>{
@@ -131,22 +128,7 @@ const ExTrack = ()=>{
         }
     }
 
-    const sortExpenses = (how) =>{
-        if (how === "date"){
-            if (dateSortedOldestFirst){
-                let sortByDate = [...expenses].sort((a, b)=>new Date(b.date)- new Date(a.date))
-                setDateSortedOldestFirst(!dateSortedOldestFirst)
-                setExpenses(sortByDate)
-            }else{
-                let sortByDate = [...expenses].sort((a, b)=>new Date(a.date)- new Date(b.date))
-                setDateSortedOldestFirst(!dateSortedOldestFirst)
-                setExpenses(sortByDate)
-            }
-        }else if (how === "amount"){
 
-        }
-        
-    }
     useEffect(()=>{
         if (!token){
             navigate("/")
@@ -185,11 +167,7 @@ const ExTrack = ()=>{
             <table>
                 <thead>
                 <tr>
-                    <th> <span className="lucide-aligned"> Date &nbsp;<span className='lucide-button'>{dateSortedOldestFirst?<ArrowDownWideNarrow onClick={()=>sortExpenses("date")}/>:<ArrowDownNarrowWide onClick={()=>sortExpenses("date")}/>}</span></span></th>
-                    <th> <span className="lucide-aligned">Expense Amount &nbsp;<span className='lucide-button'>
-                        <FilterIcon/></span></span></th>
-                    <th> Expense Type</th>
-                    <th> Note</th>
+                    <SortExpense expenses={expenses} setExpenses={setExpenses}/>
                 </tr>
                 </thead>
                 <tbody>
