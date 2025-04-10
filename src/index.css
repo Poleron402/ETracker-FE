@@ -189,3 +189,6 @@ table td:last-child{
 #menu{
   position: absolute;
 }
+#pie-chart{
+  margin: 20px;
+}

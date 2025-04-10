@@ -25,6 +25,6 @@ export const Types = {
     'SERVICE': "rgb(0, 29, 190)",
     'BILL': "rgb(100, 47, 107)",
     'ENTERTAINMENT': "rgb(206, 158, 28)",
-    'PRESENT': "rgb(13, 161, 124)",
+    'PRESENT': "#ada7ff",
     'CAR': "rgb(109, 98, 207)"
 }

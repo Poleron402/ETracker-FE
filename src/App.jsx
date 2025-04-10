@@ -4,7 +4,7 @@ import About from './pages/About'
 import NotFound from './pages/NotFound'
 import ExTrack from './pages/ExTrack'
 import Navbar from './components/Navbar'
-import Data from './components/Data'
+import Data from './pages/Data'
 function Home(){
   return (
     <>
