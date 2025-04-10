@@ -26,6 +26,8 @@ const Login = ()=>{
                 dispatch(setCredentials({user: data.username, token: data.token}))
                 setDialogOpen(false)
                 navigate("/track")
+                window.location.reload()
+                
             }
         }catch(err){
             alert(err)

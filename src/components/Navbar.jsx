@@ -8,7 +8,7 @@ import { api, apiError } from "../utilities"
 import Logout from "./Logout"
 
 const Navbar = ()=>{
-    const [authed, setAuthed] = useState(Cookies.get("token") || null)
+    const [authed, setAuthed] = useState(Cookies.get("token")||null)
 
     const checkTokenExpired = async()=>{
         if (authed){
@@ -34,9 +34,6 @@ const Navbar = ()=>{
         checkTokenExpired()
     }, [])
     
-
-
-
     return (
         <>
             <div id="navbar">
