@@ -197,3 +197,7 @@ table td:last-child{
   color: #757bc8;
   padding-bottom: 20px;
 }
+
+.paperData{
+  display: flex
+}

@@ -1,9 +1,6 @@
 import { LineChart } from '@mui/x-charts/';
-import { Paper, CircularProgress } from '@mui/material';
+import { Paper, CircularProgress, Box, InputLabel, MenuItem, FormControl, Select} from '@mui/material';
 import { useState, useEffect } from "react"
-import Cookies from "js-cookie"
-import { api, apiError} from "../../utilities"
-import { AcUnit } from '@mui/icons-material';
 
 
 const MyLineChart = ({expenses}) =>{
@@ -11,8 +8,9 @@ const MyLineChart = ({expenses}) =>{
     // const [sortedData, setSortedDate] = useState()
     const [allDates, setAllDates] = useState()
     const [allSums, setAllSums] = useState()
+    const [option, setOption] = useState()
+    const options = ["All Time", 5, 10, 15, 30]
     const sortExpensesByDate = (data) =>{
-        //let dataF = data.sort((a, b)=>new Date(b.date)-new Date(a.date))
         let dataSorted = data.sort((a, b)=>new Date(a.date) - new Date(b.date))
         let reduced = Object.entries(dataSorted.reduce((accumulator, current)=>{
             let date = new Date(current.date)
@@ -56,12 +54,34 @@ const MyLineChart = ({expenses}) =>{
                 sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
                 <h3 className='headerData'>My Expenses By Date</h3>
                 {dateRange?
-                <LineChart
-                    xAxis={[{ scaleType: 'band', data: allDates }]}
-                    series={[{data: allSums}]}
-                    width={500}
-                    height={300}
-                />
+                <div className="paperData">
+                    <LineChart
+                        xAxis={[{ scaleType: 'band', data: allDates }]}
+                        series={[{data: allSums}]}
+                        width={500}
+                        height={300}
+                    />
+                    <Box sx={{ minWidth: 120 }}>
+                        <FormControl fullWidth>
+                            <InputLabel id="demo-simple-select-label">TimeFrame</InputLabel>
+                            <Select
+                            defaultValue={options[0]}
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={option}
+                            label="TimeFrame"
+                            onChange={(e)=>setOption(e.target.value)}
+                            >
+                            {
+                                options.map((option, idx)=>(
+                                    <MenuItem value={option}>{option}</MenuItem>
+                                ))
+                            }
+                        
+                            </Select>
+                        </FormControl>
+                    </Box>
+                </div>
                 :
                     <CircularProgress/>
                 }
