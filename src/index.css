@@ -192,3 +192,8 @@ table td:last-child{
 #pie-chart{
   margin: 20px;
 }
+.headerData{
+  margin-top: -5px;
+  color: #757bc8;
+  padding-bottom: 20px;
+}

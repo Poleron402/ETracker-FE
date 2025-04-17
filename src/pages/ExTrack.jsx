@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { data, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { Button, Dialog, DialogActions, DialogTitle, DialogContent} from "@mui/material"
 import { api, apiError, handleKeyDown } from "../utilities"
 import Cookies from "js-cookie"
@@ -61,10 +61,11 @@ const ExTrack = ()=>{
                         Authorization: `Bearer ${token}`,
                     }
                 })
-            setDeletingExp(null)
-            setDeletingDialog(false)
-            getExpenses()
-
+            if (response.status === 200){
+                setDeletingExp(null)
+                setDeletingDialog(false)
+                getExpenses()
+            }
         }catch (error){
             apiError(error, "Deleting an expense")
         }
@@ -82,8 +83,10 @@ const ExTrack = ()=>{
                     Authorization: `Bearer ${token}`,
                   }
             })
-        getExpenses()
-        setOpenControl(false)
+        if (response.status === 200){
+            getExpenses()
+            setOpenControl(false)
+        }
     }
     
     const closeController = () =>{
@@ -172,7 +175,7 @@ const ExTrack = ()=>{
                 </thead>
                 <tbody>
                 {
-                    expenses.map((expense, id)=>(
+                    expenses.map((expense)=>(
                         <tr key = {expense.id}>
                             <td 
                             onDoubleClick={()=>handleDoubleClick(expense.id, expense, "date")}>
@@ -267,7 +270,6 @@ const ExTrack = ()=>{
             </table>
             
             </div>
-            {/* Delete confirmation dialog */}
             <Dialog open={deletingDialog}>
                 <DialogTitle>Confirm delete</DialogTitle>
                 <DialogContent>

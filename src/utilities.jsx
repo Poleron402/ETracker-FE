@@ -13,9 +13,9 @@ export const apiError = (error, context="Operation")=>{
 
 }
 
-export const handleKeyDown =(e)=>{
+export const handleKeyDown =(e, func)=>{
   if (e.key  == 'Enter'){
-      addExpense()
+      func()
   }
 }
 export const Types = {

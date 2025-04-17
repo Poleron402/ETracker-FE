@@ -1,6 +1,4 @@
 import { Button, DialogActions, DialogTitle, Dialog } from "@mui/material"
-import { useDispatch } from "react-redux"
-import { logout } from "../redux/authSlice"
 import { useState } from "react"
 import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
